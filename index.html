@@ -1,0 +1,908 @@
+<title>Acciones Correctivas Codere</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    /* Marca Codere: verde (apuestas), morado (casino), grises */
+    --brand: #2f9e3f;          /* verde corporativo */
+    --brand-dark: #23792f;
+    --brand-ink: #ffffff;
+    --brand-soft: #e4f3e6;
+    --secondary: #6d3aa6;      /* morado casino */
+    --secondary-soft: #efe8f8;
+
+    --ground: #f3f6f4;
+    --surface: #ffffff;
+    --surface-2: #eaeeec;
+    --ink: #17211d;
+    --muted: #5b6a64;
+    --line: #dbe2df;
+
+    --crit: #cf2b4d;   --crit-bg: #fbe3e9;
+    --warn: #b26f12;   --warn-bg: #f8ecd2;
+    --ok:   #2f9e44;   --ok-bg:   #e0f2e3;
+
+    --shadow: 0 1px 2px rgba(23,33,29,.05), 0 6px 20px rgba(23,33,29,.06);
+    --shadow-sm: 0 1px 2px rgba(23,33,29,.06);
+    --radius: 16px;
+    color-scheme: light;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --brand:#57c464; --brand-dark:#2f9e3f; --brand-ink:#062a0e; --brand-soft:#123420;
+      --secondary:#b892e2; --secondary-soft:#271a3a;
+      --ground:#0d1411; --surface:#151f1b; --surface-2:#1c2723; --ink:#e7efeb;
+      --muted:#9bada7; --line:#293530;
+      --crit:#fb7096; --crit-bg:#3a1622; --warn:#e6b84f; --warn-bg:#3a2c12; --ok:#57c464; --ok-bg:#123020;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --brand:#57c464; --brand-dark:#2f9e3f; --brand-ink:#062a0e; --brand-soft:#123420;
+    --secondary:#b892e2; --secondary-soft:#271a3a;
+    --ground:#0d1411; --surface:#151f1b; --surface-2:#1c2723; --ink:#e7efeb;
+    --muted:#9bada7; --line:#293530;
+    --crit:#fb7096; --crit-bg:#3a1622; --warn:#e6b84f; --warn-bg:#3a2c12; --ok:#57c464; --ok-bg:#123020;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "Manrope", system-ui, sans-serif; font-size: 15px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased; }
+  h1,h2,h3,h4 { margin: 0; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ---------- Encabezado de marca ---------- */
+  header.app { position: sticky; top: 0; z-index: 20; }
+  .banda { background: linear-gradient(100deg, var(--brand-dark), var(--brand));
+    color: var(--brand-ink); }
+  .bar { max-width: 1220px; margin: 0 auto; padding: 15px 20px;
+    display: flex; align-items: center; gap: 14px; }
+  .mark { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,.16);
+    display: grid; place-items: center; position: relative; flex-shrink: 0; }
+  .mark::before { content:""; width: 18px; height: 18px; border-radius: 50%;
+    border: 3px solid var(--brand-ink); }
+  .mark::after { content:""; position: absolute; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--brand-ink); right: 8px; bottom: 8px; }
+  .brand h1 { font-size: 18px; line-height: 1.15; }
+  .brand p { margin: 2px 0 0; font-size: 11px; opacity: .85; letter-spacing: .4px; text-transform: uppercase; }
+  .header-derecha { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .header-derecha .fecha { font-size: 12px; opacity: .85; }
+  .theme-btn { border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.12);
+    color: var(--brand-ink); border-radius: 9px; width: 36px; height: 36px; font-size: 15px; }
+
+  nav.tabs { background: var(--surface); border-bottom: 1px solid var(--line); }
+  .tabs-inner { max-width: 1220px; margin: 0 auto; padding: 0 20px; display: flex; gap: 2px; }
+  nav.tabs button { border: 0; background: none; color: var(--muted); font-weight: 700; font-size: 14px;
+    padding: 13px 16px; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+  nav.tabs button:hover { color: var(--ink); }
+  nav.tabs button[aria-selected="true"] { color: var(--brand-dark); border-bottom-color: var(--brand); }
+
+  main { max-width: 1220px; margin: 0 auto; padding: 24px 20px 72px; }
+  .view { display: none; }
+  .view.activo { display: block; animation: subir .28s ease both; }
+  @keyframes subir { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .view.activo { animation: none; } }
+
+  h2.titulo { font-size: 22px; }
+  .sub-linea { color: var(--muted); font-size: 13px; margin: 3px 0 20px; }
+
+  /* ---------- KPI tiles ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+  @media (max-width: 780px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px 18px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+  .kpi::before { content:""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--kc, var(--brand)); }
+  .kpi .valor { font-size: 32px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .kpi .rot { font-size: 12px; color: var(--muted); margin-top: 7px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .4px; }
+  .kpi.k-total { --kc: var(--brand); }
+  .kpi.k-alta  { --kc: var(--crit); }  .kpi.k-alta .valor { color: var(--crit); }
+  .kpi.k-venc  { --kc: var(--warn); }  .kpi.k-venc .valor { color: var(--warn); }
+  .kpi.k-sedes { --kc: var(--secondary); } .kpi.k-sedes .valor { color: var(--secondary); }
+
+  /* barra distribución criticidad */
+  .distrib { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 18px; box-shadow: var(--shadow-sm); margin-bottom: 18px; }
+  .distrib h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-bottom: 10px; }
+  .barra { display: flex; height: 14px; border-radius: 8px; overflow: hidden; background: var(--surface-2); }
+  .barra span { display: block; }
+  .barra .s-alta { background: var(--crit); } .barra .s-media { background: var(--warn); } .barra .s-baja { background: var(--ok); }
+  .barra-leyenda { display: flex; gap: 18px; margin-top: 10px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .barra-leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+  .pt { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* ---------- Estadísticas ---------- */
+  .graf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+  @media (max-width: 820px) { .graf-grid { grid-template-columns: 1fr; } }
+  .card-graf { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); padding: 18px 20px; }
+  .card-graf.ancho { grid-column: 1 / -1; }
+  .card-graf h3 { font-size: 14px; margin-bottom: 4px; }
+  .card-graf .nota { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .barras { display: flex; flex-direction: column; gap: 11px; }
+  .barra-row { display: grid; grid-template-columns: 150px 1fr auto; align-items: center; gap: 12px; }
+  @media (max-width: 500px) { .barra-row { grid-template-columns: 110px 1fr auto; } }
+  .barra-row .etq { font-size: 12.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .barra-track { background: var(--surface-2); border-radius: 6px; height: 20px; overflow: hidden; display: flex; }
+  .barra-fill { height: 100%; border-radius: 6px; min-width: 2px; }
+  .barra-seg { height: 100%; }
+  .barra-seg + .barra-seg { margin-left: 2px; }
+  .barra-row .val { font-family: "IBM Plex Mono"; font-size: 12.5px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .donut-wrap { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .donut-leg { display: flex; flex-direction: column; gap: 9px; font-size: 13px; }
+  .donut-leg .li { display: flex; align-items: center; gap: 9px; }
+  .donut-leg .sw { width: 12px; height: 12px; border-radius: 3px; }
+  .donut-leg .n { font-family: "IBM Plex Mono"; font-weight: 600; margin-left: auto; padding-left: 14px; font-variant-numeric: tabular-nums; }
+  .cumpl { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .cumpl .aguja { font-size: 44px; font-weight: 800; line-height: 1; color: var(--ok); font-variant-numeric: tabular-nums; }
+  .cumpl .aguja small { font-size: 16px; }
+  .leg-inline { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .leg-inline span { display: inline-flex; align-items: center; gap: 6px; }
+  .leg-inline .sw { width: 10px; height: 10px; border-radius: 3px; }
+  .tabla-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 18px 20px; overflow-x: auto; }
+  .tabla-wrap h3 { font-size: 14px; margin-bottom: 14px; }
+  table.matriz { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.matriz th, table.matriz td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  table.matriz th:first-child, table.matriz td:first-child { text-align: left; }
+  table.matriz thead th { color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: .3px; }
+  table.matriz tbody tr:hover { background: var(--surface-2); }
+  table.matriz tfoot td { font-weight: 800; border-top: 2px solid var(--line); border-bottom: none; }
+  .celda-alta { color: var(--crit); font-weight: 600; } .celda-media { color: var(--warn); font-weight: 600; } .celda-baja { color: var(--ok); font-weight: 600; }
+
+  /* ---------- Filtros ---------- */
+  .filtros { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .filtro-campo { display: flex; flex-direction: column; gap: 5px; font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+  .filtro-campo select { font-family: "Manrope"; text-transform: none; letter-spacing: 0; font-size: 13.5px;
+    font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 9px 12px; min-width: 210px; }
+  .btn-limpiar { border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+    border-radius: 10px; padding: 10px 15px; font-size: 13px; font-weight: 700; }
+  .btn-limpiar:hover { border-color: var(--brand); color: var(--brand-dark); }
+  .io-sep { flex: 1; min-width: 8px; }
+  .btn-io { border: 1px solid var(--brand); background: var(--brand-soft); color: var(--brand-dark);
+    border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 700; }
+  .btn-io:hover { background: var(--brand); color: var(--brand-ink); }
+  @media (max-width: 700px) { .io-sep { display: none; width: 100%; } .btn-io { flex: 1; } }
+  .json-area { width: 100%; min-height: 240px; font-family: "IBM Plex Mono", monospace; font-size: 12px;
+    color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; resize: vertical; }
+  .json-fila { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+
+  /* ---------- Tablero ---------- */
+  .board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(280px, 1fr);
+    gap: 14px; overflow-x: auto; padding-bottom: 10px; }
+  @media (max-width: 860px) { .board { grid-auto-flow: row; grid-auto-columns: auto; } }
+  .col { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+  .col > header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 2px 4px; }
+  .col > header h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 700; }
+  .col .cuenta { font-family: "IBM Plex Mono"; font-size: 12px; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 1px 9px; }
+  .lista { display: flex; flex-direction: column; gap: 10px; }
+  .lista-unica { display: flex; flex-direction: column; gap: 12px; max-width: 780px; }
+  .lista-unica .card-foto { height: 180px; }
+  .chip-estado { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); background: var(--surface-2); }
+  .chip-estado.est-EN_ANALISIS, .chip-estado.est-REABIERTO { color: var(--secondary); background: var(--secondary-soft); border-color: color-mix(in srgb, var(--secondary) 30%, var(--line)); }
+  .chip-estado.est-EN_EJECUCION { color: var(--brand-dark); background: var(--brand-soft); border-color: color-mix(in srgb, var(--brand) 30%, var(--line)); }
+  .chip-estado.est-EVALUACION_EFICACIA { color: var(--warn); background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 30%, var(--line)); }
+  .chip-estado.est-CERRADO { color: var(--ok); background: var(--ok-bg); border-color: color-mix(in srgb, var(--ok) 30%, var(--line)); }
+  .vacio { border: 1px dashed var(--line); border-radius: 10px; padding: 22px 10px; text-align: center; color: var(--muted); font-size: 12px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: 13px;
+    box-shadow: var(--shadow-sm); border-left: 4px solid var(--lc, var(--line)); transition: box-shadow .18s, transform .18s; }
+  .card:hover { box-shadow: var(--shadow); }
+  .card.c-ALTA { --lc: var(--crit); }
+  .card.c-MEDIA { --lc: var(--warn); }
+  .card.c-BAJA { --lc: var(--ok); }
+  .card .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .card .cod { font-size: 11px; color: var(--muted); }
+  .pill { font-size: 10px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+  .pill.ALTA { background: var(--crit-bg); color: var(--crit); }
+  .pill.MEDIA { background: var(--warn-bg); color: var(--warn); }
+  .pill.BAJA { background: var(--ok-bg); color: var(--ok); }
+  .card-foto { width: 100%; height: 130px; object-fit: cover; border-radius: 9px; margin-bottom: 10px; background: var(--surface-2); display: block; }
+  .card .desc { font-size: 13.5px; margin: 9px 0 9px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .card .meta { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+  .tag { background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; }
+  .tag.sede { color: var(--secondary); border-color: color-mix(in srgb, var(--secondary) 35%, var(--line)); background: var(--secondary-soft); font-weight: 700; }
+  .tag.reabierto { color: var(--crit); border-color: color-mix(in srgb, var(--crit) 40%, var(--line)); }
+  .tag.area { color: var(--brand-dark); border-color: color-mix(in srgb, var(--brand) 35%, var(--line)); background: var(--brand-soft); font-weight: 600; }
+  .sla { font-family: "IBM Plex Mono"; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-left: auto; }
+  .sla.rojo { background: var(--crit-bg); color: var(--crit); }
+  .sla.ambar { background: var(--warn-bg); color: var(--warn); }
+  .sla.verde { background: var(--ok-bg); color: var(--ok); }
+  .sla.neutro { background: var(--surface-2); color: var(--muted); }
+  .norma { margin-top: 10px; font-size: 10.5px; line-height: 1.4; color: var(--muted);
+    font-family: "IBM Plex Mono"; background: var(--surface-2); border-radius: 7px; padding: 6px 9px; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; border-top: 1px solid var(--line); padding-top: 10px; }
+  .btn-acc { font-size: 11.5px; font-weight: 700; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 5px 10px; }
+  .btn-acc:hover { border-color: var(--brand); color: var(--brand-dark); }
+  .btn-acc.primario { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+  .btn-acc.primario:hover { color: var(--brand-ink); filter: brightness(1.05); }
+  .btn-acc.peligro:hover { border-color: var(--crit); color: var(--crit); }
+  .btn-acc.editar { border-color: color-mix(in srgb, var(--secondary) 40%, var(--line)); color: var(--secondary); }
+  .btn-acc.editar:hover { background: var(--secondary-soft); border-color: var(--secondary); }
+  .lightbox { position: fixed; inset: 0; background: rgba(8,12,10,.85); display: none; align-items: center; justify-content: center; z-index: 80; padding: 24px; }
+  .lightbox.abierto { display: flex; }
+  .lightbox figure { margin: 0; max-width: 900px; width: 100%; text-align: center; }
+  .lightbox img { max-width: 100%; max-height: 76vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .lightbox figcaption { color: #fff; font-size: 13px; margin-top: 12px; }
+  .lightbox .cerrar-lb { position: absolute; top: 18px; right: 20px; background: rgba(255,255,255,.15); color: #fff; border: 0; border-radius: 9px; width: 40px; height: 40px; font-size: 18px; cursor: pointer; }
+
+  /* ---------- Formularios / paneles ---------- */
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 26px; max-width: 780px; }
+  .panel h2 { font-size: 20px; }
+  .panel > p.sub { color: var(--muted); font-size: 13px; margin: 5px 0 22px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } }
+  .campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .campo label { font-size: 12.5px; font-weight: 700; }
+  .campo label .req { color: var(--crit); }
+  .campo select, .campo input, .campo textarea { font-family: inherit; font-size: 14px; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+  .campo textarea { resize: vertical; }
+  .campo select:focus, .campo input:focus, .campo textarea:focus {
+    outline: 2px solid color-mix(in srgb, var(--brand) 55%, transparent); outline-offset: 1px; border-color: var(--brand); }
+  .aviso-sla { background: var(--brand-soft); color: var(--ink); border-radius: 11px; padding: 12px 15px; font-size: 13px; margin: 4px 0 18px; }
+  .aviso-sla strong { color: var(--brand-dark); }
+  .form-pie { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; border-top: 1px solid var(--line); padding-top: 18px; }
+  .btn { font-size: 14px; font-weight: 700; border-radius: 10px; padding: 11px 20px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+  .btn.primario { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+  .btn.primario:hover { filter: brightness(1.05); }
+
+  /* ---------- Asistente ---------- */
+  .pasos { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
+  .paso { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 600; }
+  .paso .num { width: 26px; height: 26px; border-radius: 999px; background: var(--surface-2); color: var(--muted);
+    display: grid; place-items: center; font-weight: 800; font-size: 12px; }
+  .paso.activo .num, .paso.hecho .num { background: var(--brand); color: var(--brand-ink); }
+  .paso.activo, .paso.hecho { color: var(--ink); }
+  .metodos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .metodos { grid-template-columns: 1fr; } }
+  .metodo { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 13px; padding: 18px; }
+  .metodo:hover { border-color: var(--brand); box-shadow: var(--shadow-sm); }
+  .metodo b { font-size: 15px; display: block; margin-bottom: 5px; }
+  .metodo span { font-size: 12.5px; color: var(--muted); }
+  .porque { border: 1px solid var(--line); border-radius: 11px; padding: 12px; margin-bottom: 10px; }
+  .porque .et { font-size: 12px; font-weight: 800; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+  .porque .par { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 560px) { .porque .par { grid-template-columns: 1fr; } }
+  .ishikawa { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .ishikawa { grid-template-columns: 1fr; } }
+  .categoria { border: 1px solid var(--line); border-radius: 11px; padding: 12px; }
+  .categoria h4 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .4px; color: var(--secondary); margin-bottom: 8px; }
+  .categoria ul { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+  .categoria li { font-size: 12.5px; display: flex; gap: 7px; align-items: flex-start; }
+  .cat-add { display: flex; gap: 6px; }
+  .cat-add input { flex: 1; font-size: 12.5px; padding: 6px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); }
+  .cat-add button { font-size: 12px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 0 11px; }
+
+  /* ---------- Modal / toast ---------- */
+  .overlay { position: fixed; inset: 0; background: rgba(10,16,13,.55); display: none; align-items: flex-start; justify-content: center; padding: 32px 16px; z-index: 60; overflow-y: auto; }
+  .overlay.abierto { display: flex; }
+  .modal { background: var(--surface); border-radius: 18px; box-shadow: 0 24px 60px rgba(0,0,0,.35); max-width: 720px; width: 100%; padding: 24px; border: 1px solid var(--line); }
+  .modal-cab { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+  .modal-cab .cerrar { border: 0; background: var(--surface-2); border-radius: 9px; width: 34px; height: 34px; font-size: 16px; color: var(--muted); }
+  .modal-cab .cod-modal { font-size: 12px; color: var(--muted); }
+  .modal-pie { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 16px; }
+  .errores { background: var(--crit-bg); color: var(--crit); border-radius: 10px; padding: 10px 13px; font-size: 12.5px; margin-bottom: 14px; }
+  .errores ul { margin: 4px 0 0; padding-left: 18px; }
+  .resumen-final { font-size: 13px; }
+  .resumen-final .bloque { margin-bottom: 12px; }
+  .resumen-final .bloque b { color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: .4px; display: block; margin-bottom: 3px; }
+  .marca-raiz { background: var(--warn-bg); color: var(--warn); font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 5px; text-transform: uppercase; }
+
+  #toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--ground);
+    padding: 12px 18px; border-radius: 11px; font-size: 13px; font-weight: 600; box-shadow: 0 12px 32px rgba(0,0,0,.3); opacity: 0; pointer-events: none; transition: .28s; z-index: 90; max-width: 90vw; }
+  #toast.ver { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+
+<header class="app">
+  <div class="banda">
+    <div class="bar">
+      <div class="mark" aria-hidden="true"></div>
+      <div class="brand">
+        <h1>Codere · Acciones Correctivas y de Mejora</h1>
+        <p>Sistema de Gestión de Seguridad y Salud en el Trabajo</p>
+      </div>
+      <div class="header-derecha">
+        <span class="fecha" id="fecha-hoy"></span>
+        <button class="theme-btn" id="tema" title="Cambiar tema" aria-label="Cambiar tema">◐</button>
+      </div>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <div class="tabs-inner">
+      <button role="tab" aria-selected="true" data-vista="tablero">Tablero</button>
+      <button role="tab" aria-selected="false" data-vista="estadisticas">Estadísticas</button>
+      <button role="tab" aria-selected="false" data-vista="registro">Registrar hallazgo</button>
+      <button role="tab" aria-selected="false" data-vista="asistente">Análisis de causa</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="view activo" id="v-tablero" role="tabpanel">
+    <h2 class="titulo">Tablero de hallazgos</h2>
+    <p class="sub-linea">Ciclo de vida por estado · plazos calculados automáticamente según criticidad · normativa aplicable en cada tarjeta.</p>
+
+    <div class="kpis" id="kpis"></div>
+    <div class="distrib" id="distrib"></div>
+    <div class="filtros" id="filtros"></div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <section class="view" id="v-estadisticas" role="tabpanel">
+    <h2 class="titulo">Estadísticas del sistema</h2>
+    <p class="sub-linea">Panel analítico sobre los hallazgos registrados · criticidad, sedes, estado del ciclo, temas normativos y cumplimiento de plazos.</p>
+    <div class="kpis" id="kpis-est"></div>
+    <div class="graf-grid" id="graf-grid"></div>
+    <div class="tabla-wrap" id="tabla-est"></div>
+  </section>
+
+  <section class="view" id="v-registro" role="tabpanel">
+    <form class="panel" id="form-registro" novalidate>
+      <h2>Registro de hallazgo</h2>
+      <p class="sub">Los campos con <span style="color:var(--crit)">*</span> son obligatorios.</p>
+      <div class="grid2">
+        <div class="campo"><label for="f-clasificacion">Clasificación <span class="req">*</span></label><select id="f-clasificacion" required></select></div>
+        <div class="campo"><label for="f-unidad">Unidad de negocio <span class="req">*</span></label><select id="f-unidad" required></select></div>
+        <div class="campo"><label for="f-origen">Origen del hallazgo <span class="req">*</span></label><select id="f-origen" required></select></div>
+        <div class="campo"><label for="f-criticidad">Criticidad <span class="req">*</span></label><select id="f-criticidad" required></select></div>
+      </div>
+      <div class="campo"><label for="f-sede">Sede / establecimiento</label><input id="f-sede" type="text" placeholder="Ej.: Crown San Rafael"></div>
+      <div class="aviso-sla" id="aviso-sla" hidden></div>
+      <div class="campo"><label for="f-desc">Descripción del hallazgo <span class="req">*</span></label><textarea id="f-desc" rows="4" required></textarea></div>
+      <div class="campo"><label for="f-correccion">Corrección inmediata</label><textarea id="f-correccion" rows="2"></textarea></div>
+      <div class="form-pie"><button type="submit" class="btn primario">Registrar hallazgo</button></div>
+    </form>
+  </section>
+
+  <section class="view" id="v-asistente" role="tabpanel">
+    <div class="panel" id="panel-asistente"></div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+  <div class="modal" id="modal-cuerpo"></div>
+</div>
+<div class="overlay" id="overlay-json" role="dialog" aria-modal="true" aria-labelledby="json-titulo">
+  <div class="modal" id="modal-json"></div>
+</div>
+<input type="file" id="file-json" accept=".json,application/json" hidden>
+<div class="overlay" id="overlay-edit" role="dialog" aria-modal="true" aria-labelledby="edit-titulo">
+  <div class="modal" id="modal-edit"></div>
+</div>
+<div class="lightbox" id="lightbox"><button class="cerrar-lb" aria-label="Cerrar" onclick="cerrarFoto()">✕</button><figure id="lightbox-fig"></figure></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="datos.js"></script>
+<script>
+"use strict";
+
+const ETIQUETAS = {
+  unidad: { CODERE_COLOMBIA:"Codere Colombia", BINGOS_CODERE:"Bingos Codere", CODERE_ONLINE:"Codere Online" },
+  clasificacion: { NO_CONFORMIDAD:"No conformidad", OPORTUNIDAD_MEJORA:"Oportunidad de mejora", ACCION_CORRECTIVA:"Acción correctiva" },
+  origen: { SEGUIMIENTO_PROCESOS:"Seguimiento a procesos", AUDITORIAS:"Auditorías", SEGURIDAD_SALUD_TRABAJO:"Seguridad y salud en el trabajo",
+    PRODUCTO_NO_CONFORME:"Producto no conforme", QUEJA_EXTERNA:"Queja externa", QUEJA_INTERNA:"Queja interna", CUMPLIMIENTO_LEGAL:"Cumplimiento legal", SEGURIDAD_INFORMACION:"Seguridad de la información" },
+  criticidad: { ALTA:"Alta", MEDIA:"Media", BAJA:"Baja" },
+  estado: { REGISTRADO:"Registrado", EN_ANALISIS:"En análisis", EN_EJECUCION:"En ejecución", EVALUACION_EFICACIA:"Evaluación de eficacia", CERRADO:"Cerrado", REABIERTO:"Reabierto" },
+  categoria: { MANO_DE_OBRA:"Mano de obra (personas)", MAQUINARIA_EQUIPOS:"Maquinaria y equipos", METODO:"Método (procedimientos)", MATERIAL:"Material (insumos)", MEDICION:"Medición (control y datos)", MEDIO_AMBIENTE:"Medio ambiente (entorno)" }
+};
+const DIAS_EJECUCION = { ALTA:30, MEDIA:45, BAJA:60 };
+const COLUMNAS = ["REGISTRADO","EN_ANALISIS","EN_EJECUCION","EVALUACION_EFICACIA","CERRADO"];
+const HOY = new Date();
+
+function esFinDeSemana(f){ const d=f.getDay(); return d===0||d===6; }
+function sumarDiasHabiles(inicio,n){ const r=new Date(inicio); let s=0; while(s<n){ r.setDate(r.getDate()+1); if(!esFinDeSemana(r)) s++; } return r; }
+function sumarDiasCalendario(inicio,n){ const r=new Date(inicio); r.setDate(r.getDate()+n); return r; }
+function calcularFechas(fReg,crit){ const plan=sumarDiasHabiles(fReg,10); return { plan, cierre:sumarDiasCalendario(plan,DIAS_EJECUCION[crit]) }; }
+function fmt(f){ return new Intl.DateTimeFormat("es-CO",{dateStyle:"medium"}).format(f); }
+
+const TRANSICIONES = { REGISTRADO:["EN_ANALISIS"], EN_ANALISIS:["EN_EJECUCION"], EN_EJECUCION:["EVALUACION_EFICACIA"], EVALUACION_EFICACIA:["CERRADO","REABIERTO"], REABIERTO:["EN_ANALISIS"], CERRADO:[] };
+function precondiciones(h,d){
+  const e=[];
+  if(!(TRANSICIONES[h.estado]||[]).includes(d)){ e.push("Transición no permitida."); return e; }
+  if(d==="EN_ANALISIS" && !h.responsable) e.push("Debe asignar un responsable.");
+  if(d==="EN_EJECUCION"){ if(!h.analisis) e.push("Debe completar el análisis de causa."); if(!h.plan) e.push("Debe formular el plan de acción."); }
+  if(d==="EVALUACION_EFICACIA" && !h.tareasCompletas) e.push("Debe ejecutar y evidenciar las tareas.");
+  if(d==="CERRADO" && h.evaluacion!=="EFICAZ") e.push("Requiere evaluación EFICAZ.");
+  if(d==="REABIERTO" && h.evaluacion!=="NO_EFICAZ") e.push("La reapertura requiere evaluación NO EFICAZ.");
+  return e;
+}
+
+const hallazgos = cargarDatos();
+function cargarDatos(){
+  const fuente = (typeof DATOS_HALLAZGOS !== "undefined") ? DATOS_HALLAZGOS : [];
+  return fuente.map((d,i)=>{
+    const fReg=new Date(d.fechaRegistroISO+"T08:00:00"); const {cierre}=calcularFechas(fReg,d.criticidad);
+    return { id:"h"+(i+1), consecutivo:d.consecutivo, sede:d.sede, unidad:d.unidad, clasificacion:d.clasificacion,
+      origen:d.origen, criticidad:d.criticidad, descripcion:d.descripcion, correccion:d.correccion||"", norma:d.norma||"",
+      responsableArea:d.responsableArea||"SST", foto:d.foto||"", fotoData:d.fotoData||"",
+      estado:"REGISTRADO", responsable:false, analisis:false, plan:false,
+      tareasCompletas:false, evaluacion:null, vecesReabierto:0, fechaRegistro:fReg, fechaLimiteCierre:cierre, detalleAnalisis:null };
+  });
+}
+
+const filtro = { sede:"", criticidad:"", estado:"" };
+function pasaFiltro(h){ return (!filtro.sede||h.sede===filtro.sede) && (!filtro.criticidad||h.criticidad===filtro.criticidad) && (!filtro.estado||h.estado===filtro.estado); }
+function listaSedes(){ return [...new Set(hallazgos.map(h=>h.sede).filter(Boolean))].sort(); }
+
+const $=(s,c=document)=>c.querySelector(s);
+const $$=(s,c=document)=>[...c.querySelectorAll(s)];
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("ver"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("ver"),2600); }
+function opciones(sel,mapa){ sel.innerHTML='<option value="">Seleccione…</option>'+Object.entries(mapa).map(([v,t])=>`<option value="${v}">${t}</option>`).join(""); }
+function slaBadge(h){
+  if(h.estado==="CERRADO") return {clase:"neutro",txt:"Cerrado"};
+  const dias=Math.ceil((h.fechaLimiteCierre-HOY)/86400000);
+  if(dias<0) return {clase:"rojo",txt:`Vencido ${Math.abs(dias)} d`};
+  if(dias<=5) return {clase:"ambar",txt:`Vence en ${dias} d`};
+  return {clase:"verde",txt:`${dias} d restantes`};
+}
+
+function renderKpis(visibles){
+  const total=visibles.length;
+  const alta=visibles.filter(h=>h.criticidad==="ALTA"&&h.estado!=="CERRADO").length;
+  const venc=visibles.filter(h=>h.estado!=="CERRADO"&&h.fechaLimiteCierre<HOY).length;
+  const sedes=new Set(visibles.map(h=>h.sede)).size;
+  $("#kpis").innerHTML=`
+    <div class="kpi k-total"><div class="valor">${total}</div><div class="rot">Hallazgos</div></div>
+    <div class="kpi k-alta"><div class="valor">${alta}</div><div class="rot">Criticidad alta</div></div>
+    <div class="kpi k-venc"><div class="valor">${venc}</div><div class="rot">Fuera de plazo</div></div>
+    <div class="kpi k-sedes"><div class="valor">${sedes}</div><div class="rot">Sedes</div></div>`;
+}
+function renderDistrib(visibles){
+  const a=visibles.filter(h=>h.criticidad==="ALTA").length, m=visibles.filter(h=>h.criticidad==="MEDIA").length, b=visibles.filter(h=>h.criticidad==="BAJA").length;
+  const t=Math.max(a+m+b,1);
+  $("#distrib").innerHTML=`<h4>Distribución por criticidad</h4>
+    <div class="barra" role="img" aria-label="Alta ${a}, Media ${m}, Baja ${b}">
+      <span class="s-alta" style="width:${a/t*100}%"></span><span class="s-media" style="width:${m/t*100}%"></span><span class="s-baja" style="width:${b/t*100}%"></span>
+    </div>
+    <div class="barra-leyenda">
+      <span><span class="pt" style="background:var(--crit)"></span>Alta · ${a}</span>
+      <span><span class="pt" style="background:var(--warn)"></span>Media · ${m}</span>
+      <span><span class="pt" style="background:var(--ok)"></span>Baja · ${b}</span>
+    </div>`;
+}
+function renderFiltros(){
+  const cont=$("#filtros"); if(!cont) return;
+  if(cont.dataset.listo){ $("#f-sede").value=filtro.sede; $("#f-crit").value=filtro.criticidad; if($("#f-est")) $("#f-est").value=filtro.estado; return; }
+  const sedes=listaSedes();
+  cont.innerHTML=`
+    <label class="filtro-campo">Sede<select id="f-sede"><option value="">Todas (${hallazgos.length})</option>${sedes.map(s=>`<option value="${s}">${s} (${hallazgos.filter(h=>h.sede===s).length})</option>`).join("")}</select></label>
+    <label class="filtro-campo">Criticidad<select id="f-crit"><option value="">Todas</option><option value="ALTA">Alta</option><option value="MEDIA">Media</option><option value="BAJA">Baja</option></select></label>
+    <label class="filtro-campo">Estado<select id="f-est"><option value="">Todos</option>${["REGISTRADO","EN_ANALISIS","EN_EJECUCION","EVALUACION_EFICACIA","REABIERTO","CERRADO"].map(e=>`<option value="${e}">${ETIQUETAS.estado[e]}</option>`).join("")}</select></label>
+    <button class="btn-limpiar" id="f-limpiar" type="button">Limpiar</button>
+    <span class="io-sep"></span>
+    <button class="btn-io" id="f-export" type="button">⬇ Exportar JSON</button>
+    <button class="btn-io" id="f-import" type="button">⬆ Importar JSON</button>`;
+  $("#f-sede").addEventListener("change",e=>{ filtro.sede=e.target.value; renderTablero(); });
+  $("#f-crit").addEventListener("change",e=>{ filtro.criticidad=e.target.value; renderTablero(); });
+  $("#f-est").addEventListener("change",e=>{ filtro.estado=e.target.value; renderTablero(); });
+  $("#f-limpiar").addEventListener("click",()=>{ filtro.sede=""; filtro.criticidad=""; filtro.estado=""; renderTablero(); });
+  $("#f-export").addEventListener("click",abrirExportar);
+  $("#f-import").addEventListener("click",abrirImportar);
+  cont.dataset.listo="1";
+}
+
+function renderTablero(){
+  renderFiltros();
+  const visibles=hallazgos.filter(pasaFiltro);
+  renderKpis(visibles); renderDistrib(visibles);
+  const board=$("#board"); board.innerHTML="";
+  // Orden: por estado del ciclo y luego criticidad (alta primero)
+  const ordenEstado={REGISTRADO:0,REABIERTO:1,EN_ANALISIS:2,EN_EJECUCION:3,EVALUACION_EFICACIA:4,CERRADO:5};
+  const ordenCrit={ALTA:0,MEDIA:1,BAJA:2};
+  const items=[...visibles].sort((a,b)=> (ordenEstado[a.estado]-ordenEstado[b.estado]) || (ordenCrit[a.criticidad]-ordenCrit[b.criticidad]));
+  const lista=document.createElement("div"); lista.className="lista-unica";
+  if(items.length===0) lista.innerHTML='<div class="vacio">Sin hallazgos para el filtro seleccionado</div>';
+  items.forEach(h=>lista.appendChild(tarjeta(h)));
+  board.appendChild(lista);
+}
+
+function tarjeta(h){
+  const el=document.createElement("article"); el.className="card c-"+h.criticidad;
+  const sla=slaBadge(h); const esReab=h.estado==="REABIERTO";
+  const foto=h.foto||h.fotoData||"";
+  el.innerHTML=`
+    ${foto?`<img class="card-foto" src="${foto}" alt="Registro fotográfico ${h.consecutivo}" loading="lazy">`:""}
+    <div class="top"><span class="cod mono">${h.consecutivo}</span><span class="pill ${h.criticidad}">${ETIQUETAS.criticidad[h.criticidad]}</span></div>
+    <p class="desc">${h.descripcion}</p>
+    <div class="meta">
+      <span class="chip-estado est-${h.estado}">${ETIQUETAS.estado[h.estado]}</span>
+      ${h.sede?`<span class="tag sede">${h.sede}</span>`:""}
+      ${h.responsableArea?`<span class="tag area">${h.responsableArea}</span>`:""}
+      ${esReab?`<span class="tag reabierto">Reabierto ×${h.vecesReabierto}</span>`:""}
+      <span class="sla ${sla.clase}" title="Fecha límite de cierre: ${fmt(h.fechaLimiteCierre)}">${sla.txt}</span>
+    </div>
+    ${h.norma?`<div class="norma" title="Normativa aplicable">⚖ ${h.norma}</div>`:""}`;
+  if(foto){ const im=el.querySelector(".card-foto"); im.style.cursor="zoom-in"; im.onclick=()=>abrirFoto(h); }
+  const acc=document.createElement("div"); acc.className="acciones"; acc.append(...botonesAccion(h));
+  el.appendChild(acc);
+  return el;
+}
+function botonesAccion(h){
+  const bs=[]; const b=(t,c,fn)=>{ const x=document.createElement("button"); x.className="btn-acc "+(c||""); x.textContent=t; x.onclick=fn; return x; };
+  switch(h.estado){
+    case "REGISTRADO":
+      if(!h.responsable) bs.push(b("Asignar responsable","",()=>{ h.responsable=true; toast("Responsable asignado"); renderTablero(); }));
+      else bs.push(b("→ En análisis","primario",()=>avanzar(h,"EN_ANALISIS"))); break;
+    case "EN_ANALISIS": case "REABIERTO":
+      bs.push(b(h.analisis?"Editar análisis":"Analizar causa","",()=>abrirAsistente(h)));
+      if(h.analisis&&h.plan) bs.push(b("→ En ejecución","primario",()=>avanzar(h,"EN_EJECUCION"))); break;
+    case "EN_EJECUCION":
+      if(!h.tareasCompletas) bs.push(b("Ejecutar y evidenciar","",()=>{ h.tareasCompletas=true; toast("Tareas ejecutadas"); renderTablero(); }));
+      else bs.push(b("→ Evaluación de eficacia","primario",()=>avanzar(h,"EVALUACION_EFICACIA"))); break;
+    case "EVALUACION_EFICACIA":
+      bs.push(b("Eficaz · Cerrar","primario",()=>{ h.evaluacion="EFICAZ"; avanzar(h,"CERRADO"); }));
+      bs.push(b("No eficaz · Reabrir","peligro",()=>reabrir(h))); break;
+  }
+  bs.push(b("✎ Editar","editar",()=>abrirEditar(h)));
+  return bs;
+}
+function avanzar(h,d){ const e=precondiciones(h,d); if(e.length){ toast(e[0]); return; } h.estado=d; if(d==="EN_ANALISIS") h.evaluacion=null; toast(`${h.consecutivo} → ${ETIQUETAS.estado[d]}`); renderTablero(); }
+function reabrir(h){ h.evaluacion="NO_EFICAZ"; h.vecesReabierto++; h.estado="EN_ANALISIS"; h.evaluacion=null; h.tareasCompletas=false; toast(`${h.consecutivo} reabierto → vuelve a análisis`); renderTablero(); }
+
+function initRegistro(){
+  opciones($("#f-clasificacion"),ETIQUETAS.clasificacion); opciones($("#f-unidad"),ETIQUETAS.unidad);
+  opciones($("#f-origen"),ETIQUETAS.origen); opciones($("#f-criticidad"),ETIQUETAS.criticidad);
+  const aviso=$("#aviso-sla");
+  $("#f-criticidad").addEventListener("change",e=>{
+    const c=e.target.value; if(!c){ aviso.hidden=true; return; }
+    const {plan,cierre}=calcularFechas(HOY,c); aviso.hidden=false;
+    aviso.innerHTML=`Plazos automáticos: <strong>10 días hábiles</strong> para análisis y plan (límite ${fmt(plan)}) · <strong>${DIAS_EJECUCION[c]} días calendario</strong> para ejecución y cierre (límite ${fmt(cierre)}).`;
+  });
+  $("#form-registro").addEventListener("submit",e=>{
+    e.preventDefault(); const v=id=>$(id).value;
+    if(["#f-clasificacion","#f-unidad","#f-origen","#f-criticidad","#f-desc"].some(s=>!v(s).trim())){ toast("Complete los campos obligatorios."); return; }
+    const crit=v("#f-criticidad"); const {cierre}=calcularFechas(HOY,crit);
+    hallazgos.unshift({ id:"h"+Date.now(), consecutivo:`ACPM-COL-2026-${String(9000+hallazgos.length).padStart(4,"0")}`,
+      sede:v("#f-sede").trim()||"Sin sede", unidad:v("#f-unidad"), clasificacion:v("#f-clasificacion"), origen:v("#f-origen"),
+      criticidad:crit, descripcion:v("#f-desc").trim(), correccion:v("#f-correccion").trim(), norma:"Por clasificar", responsableArea:"SST",
+      estado:"REGISTRADO", responsable:false, analisis:false, plan:false, tareasCompletas:false, evaluacion:null, vecesReabierto:0,
+      fechaRegistro:new Date(), fechaLimiteCierre:cierre, detalleAnalisis:null });
+    e.target.reset(); aviso.hidden=true; filtro.sede=""; filtro.criticidad=""; if($("#f-sede")) {}
+    renderFiltros(); renderTablero(); irA("tablero"); toast("Hallazgo registrado");
+  });
+}
+
+/* ---- Asistente de análisis de causa ---- */
+let ctxAsistente=null;
+function abrirAsistente(h){ ctxAsistente={ hallazgo:h, paso:h.detalleAnalisis?2:1, metodologia:h.detalleAnalisis?.metodologia||null, datos:h.detalleAnalisis?structuredClone(h.detalleAnalisis):null }; renderModal(); $("#overlay").classList.add("abierto"); }
+function cerrarModal(){ $("#overlay").classList.remove("abierto"); ctxAsistente=null; }
+function nuevoCincoPorques(){ return { metodologia:"CINCO_PORQUES", problema:"", niveles:Array.from({length:5},()=>({p:"",r:""})), causaRaiz:"" }; }
+function nuevoSeisM(){ return { metodologia:"SEIS_M_ISHIKAWA", efecto:"", causas:[] }; }
+function validarAnalisis(d){
+  const e=[]; if(!d){ e.push("Seleccione una metodología."); return e; }
+  if(d.metodologia==="CINCO_PORQUES"){ if(!d.problema.trim()) e.push("Declare el problema."); d.niveles.forEach((n,i)=>{ if(!n.p.trim()||!n.r.trim()) e.push(`El porqué ${i+1} debe tener pregunta y respuesta.`); }); if(!d.causaRaiz.trim()) e.push("Concluya la causa raíz."); }
+  else { if(!d.efecto.trim()) e.push("Declare el efecto o problema central."); if(d.causas.length===0) e.push("Registre al menos una causa posible."); if(!d.causas.some(c=>c.raiz)) e.push("Priorice al menos una causa raíz."); }
+  return e;
+}
+function renderModal(){
+  const c=ctxAsistente,m=$("#modal-cuerpo"),pasos=["Metodología","Diligenciar","Revisar"];
+  const cab=`<div class="modal-cab"><div><h2 id="modal-titulo" style="font-size:18px">Análisis de causa raíz</h2><span class="cod-modal mono">${c.hallazgo.consecutivo} · ${c.hallazgo.sede||""}</span></div><button class="cerrar" aria-label="Cerrar" onclick="cerrarModal()">✕</button></div>
+    <div class="pasos">${pasos.map((p,i)=>`<div class="paso ${c.paso===i+1?'activo':(c.paso>i+1?'hecho':'')}"><span class="num">${i+1}</span>${p}</div>`).join("")}</div>`;
+  let cuerpo="";
+  if(c.paso===1) cuerpo=`<div class="metodos"><button class="metodo" onclick="elegirMetodo('CINCO_PORQUES')"><b>Cinco porqués</b><span>Cadena de preguntas sucesivas hasta llegar a la causa raíz.</span></button><button class="metodo" onclick="elegirMetodo('SEIS_M_ISHIKAWA')"><b>Diagrama causa-efecto (Seis M)</b><span>Causas por seis categorías: personas, maquinaria, método, material, medición y medio ambiente.</span></button></div>`;
+  else if(c.paso===2) cuerpo=c.metodologia==="CINCO_PORQUES"?formCincoPorques(c.datos):formSeisM(c.datos);
+  else cuerpo=resumenFinal(c.datos);
+  const pie=`<div class="modal-pie"><button class="btn" onclick="atrasAsistente()" ${c.paso===1?"disabled":""}>Atrás</button>${c.paso===2?'<button class="btn primario" onclick="revisarAsistente()">Revisar</button>':""}${c.paso===3?'<button class="btn primario" onclick="confirmarAsistente()">Confirmar análisis</button>':""}</div>`;
+  m.innerHTML=cab+'<div id="err-slot"></div>'+cuerpo+pie;
+}
+function elegirMetodo(mt){ ctxAsistente.metodologia=mt; ctxAsistente.datos=mt==="CINCO_PORQUES"?nuevoCincoPorques():nuevoSeisM(); ctxAsistente.paso=2; renderModal(); }
+function atrasAsistente(){ ctxAsistente.paso=ctxAsistente.paso===3?2:1; if(ctxAsistente.paso===1){ ctxAsistente.datos=null; ctxAsistente.metodologia=null; } renderModal(); }
+function revisarAsistente(){ leerFormulario(); const e=validarAnalisis(ctxAsistente.datos); if(e.length){ mostrarErrores(e); return; } ctxAsistente.paso=3; renderModal(); }
+function confirmarAsistente(){ const e=validarAnalisis(ctxAsistente.datos); if(e.length){ mostrarErrores(e); return; } const h=ctxAsistente.hallazgo; h.detalleAnalisis=ctxAsistente.datos; h.analisis=true; if(!h.plan) h.plan=true; cerrarModal(); renderTablero(); toast("Análisis guardado · plan de acción generado"); }
+function mostrarErrores(e){ const s=$("#err-slot"); s.innerHTML=`<div class="errores"><b>Revise:</b><ul>${e.map(x=>`<li>${x}</li>`).join("")}</ul></div>`; s.scrollIntoView({behavior:"smooth",block:"nearest"}); }
+function formCincoPorques(d){
+  return `<div class="campo"><label>Problema declarado <span class="req">*</span></label><textarea id="a-problema" rows="2">${d.problema}</textarea></div>
+    ${d.niveles.map((n,i)=>`<div class="porque"><div class="et">Porqué ${i+1}</div><div class="par"><div class="campo" style="margin:0"><label>¿Por qué?</label><input data-nivel="${i}" data-c="p" value="${escAttr(n.p)}"></div><div class="campo" style="margin:0"><label>Respuesta (causa)</label><input data-nivel="${i}" data-c="r" value="${escAttr(n.r)}"></div></div></div>`).join("")}
+    <button class="btn" type="button" style="padding:7px 12px;font-size:13px" onclick="agregarPorque()">+ Agregar otro porqué</button>
+    <div class="campo" style="margin-top:14px"><label>Causa raíz identificada <span class="req">*</span></label><textarea id="a-raiz" rows="2">${d.causaRaiz}</textarea></div>`;
+}
+function agregarPorque(){ leerFormulario(); ctxAsistente.datos.niveles.push({p:"",r:""}); renderModal(); }
+function formSeisM(d){
+  const cats=Object.keys(ETIQUETAS.categoria);
+  return `<div class="campo"><label>Efecto o problema central <span class="req">*</span></label><textarea id="a-efecto" rows="2">${d.efecto}</textarea></div>
+    <div class="ishikawa">${cats.map(cat=>{ const items=d.causas.map((c,idx)=>({c,idx})).filter(o=>o.c.categoria===cat);
+      return `<div class="categoria"><h4>${ETIQUETAS.categoria[cat]}</h4><ul>${items.map(o=>`<li><input type="checkbox" ${o.c.raiz?"checked":""} onchange="toggleRaiz(${o.idx})" aria-label="Marcar causa raíz"><span style="${o.c.raiz?'font-weight:700':''}">${o.c.desc} ${o.c.raiz?'<span class="marca-raiz">raíz</span>':''}</span><button onclick="quitarCausa(${o.idx})" style="margin-left:auto;border:0;background:none;color:var(--crit);font-size:11px;cursor:pointer">quitar</button></li>`).join("")||'<li style="color:var(--muted)">Sin causas</li>'}</ul><div class="cat-add"><input id="add-${cat}" placeholder="Causa posible…"><button type="button" onclick="agregarCausa('${cat}')">+</button></div></div>`; }).join("")}</div>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px">Marque la casilla de las causas priorizadas como causa raíz.</p>`;
+}
+function agregarCausa(cat){ leerFormulario(); const inp=$("#add-"+cat); const t=inp.value.trim(); if(!t) return; ctxAsistente.datos.causas.push({categoria:cat,desc:t,raiz:false}); renderModal(); }
+function quitarCausa(i){ leerFormulario(); ctxAsistente.datos.causas.splice(i,1); renderModal(); }
+function toggleRaiz(i){ leerFormulario(); ctxAsistente.datos.causas[i].raiz=!ctxAsistente.datos.causas[i].raiz; renderModal(); }
+function leerFormulario(){ const d=ctxAsistente.datos; if(!d) return;
+  if(d.metodologia==="CINCO_PORQUES"){ const p=$("#a-problema"); if(p) d.problema=p.value; const r=$("#a-raiz"); if(r) d.causaRaiz=r.value; $$("input[data-nivel]").forEach(inp=>{ d.niveles[+inp.dataset.nivel][inp.dataset.c]=inp.value; }); }
+  else if(d.metodologia==="SEIS_M_ISHIKAWA"){ const ef=$("#a-efecto"); if(ef) d.efecto=ef.value; } }
+function resumenFinal(d){
+  if(d.metodologia==="CINCO_PORQUES") return `<div class="resumen-final"><div class="bloque"><b>Problema declarado</b>${d.problema}</div><div class="bloque"><b>Cadena de porqués</b><ol style="margin:0;padding-left:18px">${d.niveles.map(n=>`<li>${n.p} — <em>${n.r}</em></li>`).join("")}</ol></div><div class="bloque"><b>Causa raíz identificada</b>${d.causaRaiz}</div></div>`;
+  return `<div class="resumen-final"><div class="bloque"><b>Efecto analizado</b>${d.efecto}</div><div class="bloque"><b>Causas posibles</b><ul style="margin:0;padding-left:18px">${d.causas.map(c=>`<li>[${ETIQUETAS.categoria[c.categoria]}] ${c.desc} ${c.raiz?'<span class="marca-raiz">raíz</span>':''}</li>`).join("")}</ul></div></div>`;
+}
+function escAttr(s){ return String(s).replace(/"/g,"&quot;"); }
+function renderPanelAsistente(){
+  const enA=hallazgos.filter(h=>h.estado==="EN_ANALISIS"||h.estado==="REABIERTO"); const p=$("#panel-asistente");
+  p.innerHTML=`<h2>Asistente de análisis de causa</h2><p class="sub">Seleccione un hallazgo en análisis para aplicar la metodología de causa raíz (Cinco porqués o Diagrama Seis M).</p>
+    ${enA.length?`<div style="display:flex;flex-direction:column;gap:10px">${enA.map(h=>`<button class="metodo" style="display:flex;justify-content:space-between;align-items:center;gap:12px" onclick="abrirAsistente(hallazgos.find(x=>x.id==='${h.id}'))"><span><b style="display:inline">${h.consecutivo}</b> — ${h.sede||""}<br><span>${h.descripcion}</span></span><span class="pill ${h.criticidad}">${ETIQUETAS.criticidad[h.criticidad]}</span></button>`).join("")}</div>`:`<div class="vacio" style="padding:30px">No hay hallazgos en análisis. Mueva alguno a "En análisis" desde el tablero (asigne responsable y avance).</div>`}`;
+}
+
+/* ================= Estadísticas (dashboard) ================= */
+const CRIT_COLOR = { ALTA:"var(--crit)", MEDIA:"var(--warn)", BAJA:"var(--ok)" };
+const TEMAS = [
+  { t:"Extintores", kw:["NTC 2885","extintor"] },
+  { t:"Emergencias y evacuación", kw:["2.2.4.6.25","Ley 1523","evacuaci"] },
+  { t:"Riesgo eléctrico", kw:["RETIE","90708"] },
+  { t:"Botiquín y primeros auxilios", kw:["705/2007","botiqu"] },
+  { t:"Productos químicos", kw:["1496/2018","SGA","1692"] },
+  { t:"Gestión de residuos", kw:["2184/2019","1076/2015","residuo"] },
+  { t:"Señalización", kw:["NTC 1461"] },
+  { t:"Orden y aseo", kw:["orden y aseo"] },
+];
+function temaDe(h){
+  const s=(h.norma||"")+" "+(h.descripcion||"");
+  for(const {t,kw} of TEMAS){ if(kw.some(k=>s.toLowerCase().includes(k.toLowerCase()))) return t; }
+  return "Otros";
+}
+function contarPor(arr, fn){ const m={}; arr.forEach(x=>{ const k=fn(x); m[k]=(m[k]||0)+1; }); return m; }
+
+function barrasSimples(items, color){
+  const max=Math.max(1,...items.map(i=>i.value));
+  return `<div class="barras">`+items.map(i=>`
+    <div class="barra-row" title="${i.label}: ${i.value}">
+      <span class="etq">${i.label}</span>
+      <div class="barra-track" style="width:100%"><div class="barra-fill" style="width:${i.value/max*100}%;background:${i.color||color}"></div></div>
+      <span class="val">${i.value}</span>
+    </div>`).join("")+`</div>`;
+}
+function barrasApiladas(rows){ // rows: [{label, alta, media, baja, total}]
+  const max=Math.max(1,...rows.map(r=>r.total));
+  return `<div class="barras">`+rows.map(r=>`
+    <div class="barra-row" title="${r.label} — Alta ${r.alta}, Media ${r.media}, Baja ${r.baja}">
+      <span class="etq">${r.label}</span>
+      <div class="barra-track" style="width:${r.total/max*100}%">
+        ${r.alta?`<div class="barra-seg" style="width:${r.alta/r.total*100}%;background:var(--crit)"></div>`:""}
+        ${r.media?`<div class="barra-seg" style="width:${r.media/r.total*100}%;background:var(--warn)"></div>`:""}
+        ${r.baja?`<div class="barra-seg" style="width:${r.baja/r.total*100}%;background:var(--ok)"></div>`:""}
+      </div>
+      <span class="val">${r.total}</span>
+    </div>`).join("")+`</div>
+    <div class="leg-inline"><span><span class="sw" style="background:var(--crit)"></span>Alta</span><span><span class="sw" style="background:var(--warn)"></span>Media</span><span><span class="sw" style="background:var(--ok)"></span>Baja</span></div>`;
+}
+function donut(parts){ // parts:[{label,value,color}]
+  const total=parts.reduce((a,p)=>a+p.value,0)||1; const r=52,c=2*Math.PI*r; let off=0;
+  const segs=parts.filter(p=>p.value>0).map(p=>{ const len=p.value/total*c; const s=`<circle cx="60" cy="60" r="${r}" fill="none" stroke="${p.color}" stroke-width="22" stroke-dasharray="${len} ${c-len}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"><title>${p.label}: ${p.value}</title></circle>`; off+=len; return s; }).join("");
+  const leg=parts.map(p=>`<div class="li"><span class="sw" style="background:${p.color}"></span>${p.label}<span class="n">${p.value} · ${Math.round(p.value/total*100)}%</span></div>`).join("");
+  return `<div class="donut-wrap">
+    <svg width="140" height="140" viewBox="0 0 120 120" role="img" aria-label="Distribución por criticidad">
+      <circle cx="60" cy="60" r="52" fill="none" stroke="var(--surface-2)" stroke-width="22"></circle>
+      ${segs}
+      <text x="60" y="56" text-anchor="middle" font-size="26" font-weight="800" fill="var(--ink)" font-family="Manrope">${total}</text>
+      <text x="60" y="74" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="Manrope">hallazgos</text>
+    </svg>
+    <div class="donut-leg">${leg}</div></div>`;
+}
+
+function renderEstadisticas(){
+  const H=hallazgos, total=H.length;
+  const crit=contarPor(H,h=>h.criticidad);
+  const cA=crit.ALTA||0,cM=crit.MEDIA||0,cB=crit.BAJA||0;
+  const activos=H.filter(h=>h.estado!=="CERRADO");
+  const vencidos=activos.filter(h=>h.fechaLimiteCierre<HOY).length;
+  const aTiempo=activos.length-vencidos;
+  const cerrados=H.filter(h=>h.estado==="CERRADO").length;
+  const pctAT = activos.length? Math.round(aTiempo/activos.length*100) : 100;
+  const sedes=[...new Set(H.map(h=>h.sede))].sort();
+
+  $("#kpis-est").innerHTML=`
+    <div class="kpi k-total"><div class="valor">${total}</div><div class="rot">Hallazgos</div></div>
+    <div class="kpi k-alta"><div class="valor">${cA}</div><div class="rot">Criticidad alta</div></div>
+    <div class="kpi k-venc"><div class="valor">${vencidos}</div><div class="rot">Fuera de plazo</div></div>
+    <div class="kpi k-sedes"><div class="valor">${sedes.length}</div><div class="rot">Sedes</div></div>`;
+
+  // por sede apilado
+  const filasSede=sedes.map(s=>{ const hs=H.filter(h=>h.sede===s);
+    return { label:s, alta:hs.filter(h=>h.criticidad==="ALTA").length, media:hs.filter(h=>h.criticidad==="MEDIA").length, baja:hs.filter(h=>h.criticidad==="BAJA").length, total:hs.length }; })
+    .sort((a,b)=>b.total-a.total);
+  // por estado
+  const ordenEstado=["REGISTRADO","EN_ANALISIS","REABIERTO","EN_EJECUCION","EVALUACION_EFICACIA","CERRADO"];
+  const estadoItems=ordenEstado.map(e=>({label:ETIQUETAS.estado[e], value:H.filter(h=>h.estado===e).length})).filter(i=>i.value>0);
+  // por tema
+  const temaMap=contarPor(H,temaDe);
+  const temaItems=Object.entries(temaMap).map(([label,value])=>({label,value})).sort((a,b)=>b.value-a.value);
+
+  $("#graf-grid").innerHTML=`
+    <div class="card-graf"><h3>Distribución por criticidad</h3><p class="nota">Nivel de riesgo de los hallazgos</p>
+      ${donut([{label:"Alta",value:cA,color:"var(--crit)"},{label:"Media",value:cM,color:"var(--warn)"},{label:"Baja",value:cB,color:"var(--ok)"}])}</div>
+    <div class="card-graf"><h3>Cumplimiento de plazos</h3><p class="nota">Hallazgos activos dentro del plazo de cierre</p>
+      <div class="cumpl"><div class="aguja">${pctAT}<small>%</small></div>
+        <div style="flex:1;min-width:180px">
+          <div class="barra-track" style="width:100%;height:24px">
+            ${aTiempo?`<div class="barra-seg" style="width:${aTiempo/Math.max(1,activos.length)*100}%;background:var(--ok)"></div>`:""}
+            ${vencidos?`<div class="barra-seg" style="width:${vencidos/Math.max(1,activos.length)*100}%;background:var(--crit)"></div>`:""}
+          </div>
+          <div class="leg-inline"><span><span class="sw" style="background:var(--ok)"></span>A tiempo · ${aTiempo}</span><span><span class="sw" style="background:var(--crit)"></span>Vencidos · ${vencidos}</span><span>Cerrados · ${cerrados}</span></div>
+        </div></div></div>
+    <div class="card-graf ancho"><h3>Hallazgos por sede</h3><p class="nota">Composición por criticidad en cada establecimiento</p>${barrasApiladas(filasSede)}</div>
+    <div class="card-graf"><h3>Por estado del ciclo</h3><p class="nota">Etapa actual en el flujo de tratamiento</p>${barrasSimples(estadoItems,"var(--brand)")}</div>
+    <div class="card-graf"><h3>Por tema normativo</h3><p class="nota">Agrupación según la norma aplicable</p>${barrasSimples(temaItems,"var(--secondary)")}</div>`;
+
+  // tabla estructurada sede x criticidad
+  const filasTabla=filasSede.map(r=>`<tr><td>${r.label}</td><td class="celda-alta">${r.alta}</td><td class="celda-media">${r.media}</td><td class="celda-baja">${r.baja}</td><td>${r.total}</td></tr>`).join("");
+  $("#tabla-est").innerHTML=`<h3>Matriz de hallazgos por sede y criticidad</h3>
+    <table class="matriz"><thead><tr><th>Sede</th><th>Alta</th><th>Media</th><th>Baja</th><th>Total</th></tr></thead>
+    <tbody>${filasTabla}</tbody>
+    <tfoot><tr><td>Total</td><td class="celda-alta">${cA}</td><td class="celda-media">${cM}</td><td class="celda-baja">${cB}</td><td>${total}</td></tr></tfoot></table>`;
+}
+
+function irA(vista){
+  $$('nav.tabs button').forEach(b=>b.setAttribute("aria-selected",b.dataset.vista===vista));
+  $$('.view').forEach(v=>v.classList.remove("activo")); $("#v-"+vista).classList.add("activo");
+  if(vista==="tablero") renderTablero(); if(vista==="asistente") renderPanelAsistente(); if(vista==="estadisticas") renderEstadisticas();
+}
+$$('nav.tabs button').forEach(b=>b.addEventListener("click",()=>irA(b.dataset.vista)));
+$("#tema").addEventListener("click",()=>{ const r=document.documentElement; const act=r.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"); r.setAttribute("data-theme",act==="dark"?"light":"dark"); });
+$("#overlay").addEventListener("click",e=>{ if(e.target.id==="overlay") cerrarModal(); });
+$("#overlay-json").addEventListener("click",e=>{ if(e.target.id==="overlay-json") cerrarJson(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ cerrarModal(); cerrarJson(); if(typeof cerrarEditar==="function") cerrarEditar(); if(typeof cerrarFoto==="function") cerrarFoto(); } });
+$("#fecha-hoy").textContent=new Intl.DateTimeFormat("es-CO",{dateStyle:"full"}).format(HOY);
+
+/* ================= Exportar / Importar JSON ================= */
+function serializarHallazgos(){
+  return hallazgos.map(h=>({
+    consecutivo:h.consecutivo, sede:h.sede, unidad:h.unidad, clasificacion:h.clasificacion,
+    origen:h.origen, criticidad:h.criticidad, descripcion:h.descripcion, correccion:h.correccion||"",
+    responsableArea:h.responsableArea||"", norma:h.norma||"", foto:h.foto||"", fotoData:h.fotoData||"",
+    fechaRegistroISO: (h.fechaRegistro instanceof Date && !isNaN(h.fechaRegistro)) ? h.fechaRegistro.toISOString().slice(0,10) : (h.fechaRegistroISO||""),
+    estado:h.estado, responsable:!!h.responsable, analisis:!!h.analisis, plan:!!h.plan,
+    tareasCompletas:!!h.tareasCompletas, evaluacion:h.evaluacion||null, vecesReabierto:h.vecesReabierto||0,
+    detalleAnalisis:h.detalleAnalisis||null
+  }));
+}
+function normalizarImportado(d,i){
+  const iso=d.fechaRegistroISO || (d.fechaRegistro? String(d.fechaRegistro).slice(0,10) : "2026-09-01");
+  const fReg=new Date(iso+"T08:00:00");
+  const crit=d.criticidad||"MEDIA";
+  const cierre=d.fechaLimiteCierre? new Date(d.fechaLimiteCierre) : calcularFechas(fReg,crit).cierre;
+  return { id:"h"+(i+1)+"-"+Date.now(), consecutivo:d.consecutivo||("ACPM-"+(i+1)), sede:d.sede||"Sin sede",
+    unidad:d.unidad||"CODERE_COLOMBIA", clasificacion:d.clasificacion||"NO_CONFORMIDAD", origen:d.origen||"SEGURIDAD_SALUD_TRABAJO",
+    criticidad:crit, descripcion:d.descripcion||"", correccion:d.correccion||"", norma:d.norma||"", responsableArea:d.responsableArea||"SST", foto:d.foto||"", fotoData:d.fotoData||"",
+    estado:d.estado||"REGISTRADO", responsable:!!d.responsable, analisis:!!d.analisis, plan:!!d.plan,
+    tareasCompletas:!!d.tareasCompletas, evaluacion:d.evaluacion||null, vecesReabierto:d.vecesReabierto||0,
+    fechaRegistro:fReg, fechaLimiteCierre:cierre, detalleAnalisis:d.detalleAnalisis||null };
+}
+function nombreArchivoJson(){ return "acciones-correctivas-codere-"+new Date().toISOString().slice(0,10)+".json"; }
+function descargar(texto,nombre){
+  try{
+    const blob=new Blob([texto],{type:"application/json"});
+    const url=URL.createObjectURL(blob); const a=document.createElement("a");
+    a.href=url; a.download=nombre; document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },400);
+    return true;
+  }catch(e){ return false; }
+}
+function abrirExportar(){
+  const texto=JSON.stringify(serializarHallazgos(),null,2);
+  $("#modal-json").innerHTML=`
+    <div class="modal-cab"><div><h2 id="json-titulo" style="font-size:18px">Exportar hallazgos (JSON)</h2>
+      <span class="cod-modal">${hallazgos.length} registros · descarga el archivo o copia el contenido</span></div>
+      <button class="cerrar" aria-label="Cerrar" onclick="cerrarJson()">✕</button></div>
+    <textarea class="json-area" id="json-out" readonly>${texto.replace(/</g,"&lt;")}</textarea>
+    <div class="json-fila">
+      <button class="btn primario" onclick="descargarJson()">⬇ Descargar archivo</button>
+      <button class="btn" onclick="copiarJson()">Copiar al portapapeles</button>
+    </div>`;
+  $("#overlay-json").classList.add("abierto");
+}
+async function descargarJson(){
+  const t=$("#json-out").value; const nombre=nombreArchivoJson();
+  try{
+    const dl = (window.claude && claude.use) ? await claude.use("downloads") : null;
+    if(dl){ await dl.save({filename:nombre, data:t}); toast("Archivo JSON guardado"); return; }
+  }catch(e){ if(e && e.code==="declined"){ toast("Descarga cancelada"); return; } }
+  if(descargar(t,nombre)){ toast("Archivo JSON descargado"); return; }
+  toast("Usa \"Copiar al portapapeles\" para guardar el JSON.");
+}
+function copiarJson(){ const t=$("#json-out"); t.select(); try{ navigator.clipboard.writeText(t.value); toast("JSON copiado"); }catch(e){ document.execCommand("copy"); toast("JSON copiado"); } }
+function abrirImportar(){
+  $("#modal-json").innerHTML=`
+    <div class="modal-cab"><div><h2 id="json-titulo" style="font-size:18px">Importar hallazgos (JSON)</h2>
+      <span class="cod-modal">Reemplaza el tablero con el contenido del archivo o del texto pegado</span></div>
+      <button class="cerrar" aria-label="Cerrar" onclick="cerrarJson()">✕</button></div>
+    <div class="json-fila" style="margin:0 0 12px">
+      <button class="btn" onclick="document.getElementById('file-json').click()">📁 Elegir archivo .json</button>
+      <span class="cod-modal" id="json-nombre" style="align-self:center"></span>
+    </div>
+    <textarea class="json-area" id="json-in" placeholder="…o pega aquí el JSON exportado"></textarea>
+    <div class="json-fila">
+      <button class="btn primario" onclick="aplicarImport()">Cargar en el tablero</button>
+      <button class="btn" onclick="cerrarJson()">Cancelar</button>
+    </div>`;
+  $("#overlay-json").classList.add("abierto");
+}
+function aplicarImport(){
+  const texto=$("#json-in").value.trim();
+  if(!texto){ toast("Pega el JSON o elige un archivo."); return; }
+  procesarImport(texto);
+}
+function procesarImport(texto){
+  let datos;
+  try{ datos=JSON.parse(texto); }catch(e){ toast("El JSON no es válido."); return; }
+  if(!Array.isArray(datos)){ if(Array.isArray(datos.hallazgos)) datos=datos.hallazgos; else { toast("El JSON debe ser una lista de hallazgos."); return; } }
+  hallazgos.length=0;
+  datos.forEach((d,i)=>hallazgos.push(normalizarImportado(d,i)));
+  filtro.sede=""; filtro.criticidad="";
+  $("#filtros").dataset.listo=""; // reconstruye opciones de sede
+  cerrarJson(); renderTablero(); irA("tablero");
+  toast(`Se cargaron ${hallazgos.length} hallazgos`);
+}
+function cerrarJson(){ $("#overlay-json").classList.remove("abierto"); }
+$("#file-json").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const nom=$("#json-nombre"); if(nom) nom.textContent=f.name;
+  const r=new FileReader(); r.onload=()=>{ const inp=$("#json-in"); if(inp) inp.value=r.result; toast("Archivo cargado; pulsa \"Cargar en el tablero\"."); }; r.readAsText(f);
+  e.target.value="";
+});
+
+/* ================= Registro fotográfico (visor) ================= */
+function abrirFoto(h){
+  const foto=h.foto||h.fotoData; if(!foto) return;
+  $("#lightbox-fig").innerHTML=`<img src="${foto}" alt="Registro fotográfico ${h.consecutivo}"><figcaption><strong>${h.consecutivo}</strong> · ${h.sede||""} — ${h.descripcion}</figcaption>`;
+  $("#lightbox").classList.add("abierto");
+}
+function cerrarFoto(){ $("#lightbox").classList.remove("abierto"); $("#lightbox-fig").innerHTML=""; }
+$("#lightbox").addEventListener("click",e=>{ if(e.target.id==="lightbox") cerrarFoto(); });
+
+/* ================= Editar hallazgo ================= */
+let editandoId=null;
+function opcionesSel(mapa,val){ return Object.entries(mapa).map(([v,t])=>`<option value="${v}" ${v===val?"selected":""}>${t}</option>`).join(""); }
+function abrirEditar(h){
+  editandoId=h.id;
+  const foto=h.foto||h.fotoData||"";
+  $("#modal-edit").innerHTML=`
+    <div class="modal-cab"><div><h2 id="edit-titulo" style="font-size:18px">Editar hallazgo</h2>
+      <span class="cod-modal mono">${h.consecutivo}</span></div>
+      <button class="cerrar" aria-label="Cerrar" onclick="cerrarEditar()">✕</button></div>
+    ${foto?`<img class="card-foto" style="height:150px;margin-bottom:14px;cursor:zoom-in" src="${foto}" onclick="abrirFoto(hallazgos.find(x=>x.id==='${h.id}'))">`:""}
+    <div class="grid2">
+      <div class="campo"><label>Sede</label><input id="e-sede" value="${(h.sede||'').replace(/"/g,'&quot;')}"></div>
+      <div class="campo"><label>Área responsable</label><input id="e-resp" value="${(h.responsableArea||'').replace(/"/g,'&quot;')}"></div>
+      <div class="campo"><label>Criticidad</label><select id="e-crit">${opcionesSel(ETIQUETAS.criticidad,h.criticidad)}</select></div>
+      <div class="campo"><label>Clasificación</label><select id="e-clas">${opcionesSel(ETIQUETAS.clasificacion,h.clasificacion)}</select></div>
+      <div class="campo"><label>Origen</label><select id="e-orig">${opcionesSel(ETIQUETAS.origen,h.origen)}</select></div>
+      <div class="campo"><label>Estado</label><select id="e-est">${opcionesSel(ETIQUETAS.estado,h.estado)}</select></div>
+    </div>
+    <div class="campo"><label>Descripción del hallazgo</label><textarea id="e-desc" rows="3">${(h.descripcion||'')}</textarea></div>
+    <div class="campo"><label>Corrección / recomendación</label><textarea id="e-corr" rows="2">${(h.correccion||'')}</textarea></div>
+    <div class="campo"><label>Norma aplicable</label><input id="e-norma" value="${(h.norma||'').replace(/"/g,'&quot;')}"></div>
+    <div class="campo"><label>Reemplazar registro fotográfico</label><input type="file" id="e-foto" accept="image/*"></div>
+    <div class="modal-pie"><button class="btn" onclick="cerrarEditar()">Cancelar</button><button class="btn primario" onclick="guardarEdicion()">Guardar cambios</button></div>`;
+  $("#overlay-edit").classList.add("abierto");
+}
+function cerrarEditar(){ $("#overlay-edit").classList.remove("abierto"); editandoId=null; }
+function guardarEdicion(){
+  const h=hallazgos.find(x=>x.id===editandoId); if(!h) return;
+  const v=id=>$(id).value;
+  const critNueva=v("#e-crit"); const critCambio=critNueva!==h.criticidad;
+  h.sede=v("#e-sede").trim()||h.sede; h.responsableArea=v("#e-resp").trim();
+  h.criticidad=critNueva; h.clasificacion=v("#e-clas"); h.origen=v("#e-orig");
+  h.descripcion=v("#e-desc").trim(); h.correccion=v("#e-corr").trim(); h.norma=v("#e-norma").trim();
+  const estNuevo=v("#e-est"); if(estNuevo!==h.estado){ h.estado=estNuevo; }
+  if(critCambio && h.fechaRegistro){ h.fechaLimiteCierre=calcularFechas(h.fechaRegistro,critNueva).cierre; }
+  const fin=$("#e-foto").files[0];
+  const cerrarYredibujar=()=>{ cerrarEditar(); $("#filtros").dataset.listo=""; renderTablero(); toast(`${h.consecutivo} actualizado`); };
+  if(fin){ const r=new FileReader(); r.onload=()=>{ h.fotoData=r.result; h.foto=""; cerrarYredibujar(); }; r.readAsDataURL(fin); }
+  else cerrarYredibujar();
+}
+$("#overlay-edit").addEventListener("click",e=>{ if(e.target.id==="overlay-edit") cerrarEditar(); });
+
+Object.assign(window,{cerrarModal,elegirMetodo,atrasAsistente,revisarAsistente,confirmarAsistente,agregarPorque,agregarCausa,quitarCausa,toggleRaiz,abrirAsistente,hallazgos,cerrarJson,descargarJson,copiarJson,aplicarImport,abrirFoto,cerrarFoto,abrirEditar,cerrarEditar,guardarEdicion});
+
+initRegistro(); renderTablero();
+</script>
